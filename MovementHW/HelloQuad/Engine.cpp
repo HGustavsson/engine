@@ -182,13 +182,14 @@ void Engine::updateObj(uint32_t num)
 	gameObjs[num].rigid.acceleration = ((gameObjs[num].rigid.force / gameObjs[num].rigid.mass)*deltaTime);
 	gameObjs[num].rigid.velocity += gameObjs[num].rigid.acceleration;
 	gameObjs[num].trans.locPos += gameObjs[num].rigid.velocity;
-	if (num == 3 && gameObjs[num].rigid.velocity.y > .05)
-		gameObjs[num].rigid.velocity.y = .05;
-	else if (num == 3 && gameObjs[num].rigid.velocity.y < -.1)
-		gameObjs[num].rigid.velocity.y = -.1;
+	if (num == 3 && gameObjs[num].rigid.velocity.y > (float).015)
+		gameObjs[num].rigid.velocity.y = (float).015;
+	else if (num == 3 && gameObjs[num].rigid.velocity.y < (float)-.02)
+		gameObjs[num].rigid.velocity.y = (float)-.02;
 
 
 	gameObjs[num].rigid.force = { 0,0,0 }; //Zero it out so it doesn't keep applying.
+	gameObjs[num].rigid.acceleration *= (float).01;
 
 	//Gen World Matrix
 	glm::mat4 scaleMat = glm::scale(gameObjs[num].trans.locSize);
@@ -237,6 +238,7 @@ bool Engine::gameLoop()
 			glBindVertexArray(vertArr);
 			glDrawArrays(GL_TRIANGLES, 0, vertCount);
 		}
+		gameObjs[3].trans.locRot.z += .01;
 
 		//Swap Buffers
 		glfwSwapBuffers(glfwWindowPtr);
