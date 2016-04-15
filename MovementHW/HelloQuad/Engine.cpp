@@ -182,6 +182,11 @@ void Engine::updateObj(uint32_t num)
 	gameObjs[num].rigid.acceleration = ((gameObjs[num].rigid.force / gameObjs[num].rigid.mass)*deltaTime);
 	gameObjs[num].rigid.velocity += gameObjs[num].rigid.acceleration;
 	gameObjs[num].trans.locPos += gameObjs[num].rigid.velocity;
+	if (num == 3 && gameObjs[num].rigid.velocity.y > .05)
+		gameObjs[num].rigid.velocity.y = .05;
+	else if (num == 3 && gameObjs[num].rigid.velocity.y < -.1)
+		gameObjs[num].rigid.velocity.y = -.1;
+
 
 	gameObjs[num].rigid.force = { 0,0,0 }; //Zero it out so it doesn't keep applying.
 
@@ -191,6 +196,11 @@ void Engine::updateObj(uint32_t num)
 	glm::mat4 rotMat = glm::yawPitchRoll(gameObjs[num].trans.locRot.y, gameObjs[num].trans.locRot.x, gameObjs[num].trans.locRot.z);
 	glm::mat4 worldMat = posMat*rotMat*scaleMat;
 	gameObjs[num].trans.objWorldTransform = worldMat;
+}
+
+void Engine::addForce(glm::vec3 force, uint32_t numObj)
+{
+	gameObjs[numObj].rigid.force += force;
 }
 
 bool Engine::gameLoop()
@@ -235,7 +245,24 @@ bool Engine::gameLoop()
 
 		if (currInput[GLFW_KEY_ESCAPE])
 			glfwSetWindowShouldClose(glfwWindowPtr, GL_TRUE);
+		if (currInput[GLFW_KEY_A])
+			addForce(glm::vec3{ -.001, 0, 0 }, 3);
+		if (currInput[GLFW_KEY_D])
+			addForce(glm::vec3{ .001, 0, 0 }, 3);		
+		if (currInput[GLFW_KEY_W])
+			addForce(glm::vec3{ 0, .007, 0 }, 3);
+		if (currInput[GLFW_KEY_S])
+			addForce(glm::vec3{ 0, -.001, 0 }, 3);
+		
+		//Gravity
+		addForce(glm::vec3{ 0, -.005, 0 }, 3);
 
+		//Keep it on the screen!
+		if (gameObjs[3].trans.locPos.y < -0.9)
+		{
+			gameObjs[3].trans.locPos.y = -0.89;
+		}
+		
 		//Process queued window, mouse & keyboard callback events
 		prevInput = currInput;
 		glfwPollEvents();

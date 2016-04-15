@@ -19,9 +19,6 @@ int main()
 	myEngine.addTex("textures/sprite.png");
 	myEngine.addTex("textures/block.png");
 	myEngine.addTex("textures/teddy.png");
-
-	if (-1)
-		std::cout << "Whoops." << std::endl;
 	
 	myEngine.buffTex();
 
