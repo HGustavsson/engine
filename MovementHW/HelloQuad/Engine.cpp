@@ -179,17 +179,20 @@ void Engine::createObj(const char* imgName, glm::vec3 pos, glm::vec3 rot, glm::v
 void Engine::updateObj(uint32_t num)
 {
 	//Physics?
-	gameObjs[num].rigid.acceleration = ((gameObjs[num].rigid.force / gameObjs[num].rigid.mass)*deltaTime);
+	gameObjs[num].rigid.acceleration += ((gameObjs[num].rigid.force / gameObjs[num].rigid.mass)*deltaTime);
 	gameObjs[num].rigid.velocity += gameObjs[num].rigid.acceleration;
 	gameObjs[num].trans.locPos += gameObjs[num].rigid.velocity;
 	if (num == 3 && gameObjs[num].rigid.velocity.y > (float).015)
 		gameObjs[num].rigid.velocity.y = (float).015;
 	else if (num == 3 && gameObjs[num].rigid.velocity.y < (float)-.02)
 		gameObjs[num].rigid.velocity.y = (float)-.02;
+	if (num == 3 && gameObjs[num].rigid.velocity.x > (float).015)
+		gameObjs[num].rigid.velocity.x = (float).015;
+	else if (num == 3 && gameObjs[num].rigid.velocity.x < (float)-.015)
+		gameObjs[num].rigid.velocity.x = (float)-.015;
 
 
 	gameObjs[num].rigid.force = { 0,0,0 }; //Zero it out so it doesn't keep applying.
-	gameObjs[num].rigid.acceleration *= (float).01;
 
 	//Gen World Matrix
 	glm::mat4 scaleMat = glm::scale(gameObjs[num].trans.locSize);
@@ -257,7 +260,7 @@ bool Engine::gameLoop()
 			addForce(glm::vec3{ 0, -.001, 0 }, 3);
 		
 		//Gravity
-		addForce(glm::vec3{ 0, -.005, 0 }, 3);
+		//addForce(glm::vec3{ 0, -.005, 0 }, 3);
 
 		//Keep it on the screen!
 		if (gameObjs[3].trans.locPos.y < -0.9)
