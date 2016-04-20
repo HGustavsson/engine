@@ -75,4 +75,5 @@ private:
 	void createObj(const char*, glm::vec3, glm::vec3, glm::vec3, float, glm::vec3);
 	void addForce(glm::vec3, uint32_t);
 	void updateObj(uint32_t num);
+	void collides(Object, Object);
 };

@@ -181,13 +181,15 @@ void Engine::updateObj(uint32_t num)
 	//Physics?
 	gameObjs[num].rigid.acceleration += ((gameObjs[num].rigid.force / gameObjs[num].rigid.mass)*deltaTime);
 	gameObjs[num].rigid.velocity += gameObjs[num].rigid.acceleration;
-	gameObjs[num].trans.locPos += (gameObjs[num].rigid.velocity * (float).15);
-	if (num == 3 && gameObjs[num].rigid.velocity.y > (float).015)		//Limit
-		gameObjs[num].rigid.velocity.y = (float).015;
-	else if (num == 3 && gameObjs[num].rigid.velocity.y < (float)-.02)	//Limit
-		gameObjs[num].rigid.velocity.y = (float)-.02;
-	if (num == 3 && gameObjs[num].rigid.velocity.x > (float).015)		//Limit
-		gameObjs[num].rigid.velocity.x = (float).015;
+	gameObjs[num].trans.locPos += (gameObjs[num].rigid.velocity * deltaTime);
+
+
+	if (num == 3 && gameObjs[num].rigid.velocity.y > (float).0015)		//Limit
+		gameObjs[num].rigid.velocity.y = (float).0015;
+	else if (num == 3 && gameObjs[num].rigid.velocity.y < (float)-.002)	//Limit
+		gameObjs[num].rigid.velocity.y = (float)-.002;
+	if (num == 3 && gameObjs[num].rigid.velocity.x > (float).0015)		//Limit
+		gameObjs[num].rigid.velocity.x = (float).0015;
 	else if (num == 3 && gameObjs[num].rigid.velocity.x < (float)-.015)	//Limit
 		gameObjs[num].rigid.velocity.x = (float)-.015;
 
@@ -207,6 +209,11 @@ void Engine::updateObj(uint32_t num)
 void Engine::addForce(glm::vec3 force, uint32_t numObj)
 {
 	gameObjs[numObj].rigid.force += force;
+}
+
+void Engine::collides(Object objA, Object objB)
+{
+
 }
 
 bool Engine::gameLoop()
@@ -253,17 +260,17 @@ bool Engine::gameLoop()
 		if (currInput[GLFW_KEY_ESCAPE])
 			glfwSetWindowShouldClose(glfwWindowPtr, GL_TRUE);
 		if (currInput[GLFW_KEY_A])
-			addForce(glm::vec3{ -.001, 0, 0 }, 3);
+			addForce(glm::vec3{ -.0001, 0, 0 }, 3);
 		if (currInput[GLFW_KEY_D])
-			addForce(glm::vec3{ .001, 0, 0 }, 3);		
+			addForce(glm::vec3{ .0001, 0, 0 }, 3);		
 		if (currInput[GLFW_KEY_W])
-			addForce(glm::vec3{ 0, .007, 0 }, 3);
+			addForce(glm::vec3{ 0, .0007, 0 }, 3);
 		if (currInput[GLFW_KEY_S])
-			addForce(glm::vec3{ 0, -.001, 0 }, 3);
+			addForce(glm::vec3{ 0, -.0001, 0 }, 3);
 		
 		//Gravity
-		addForce(glm::vec3{ 0, -.005, 0 }, 3); //Gravity
-		//addForce(glm::vec3{gameObjs[3].rigid}, 3); //Friction?
+		addForce(glm::vec3{ 0, -.0005, 0 }, 3); //Gravity
+		//addForce(glm::vec3{gameObjs[3].rigid.velocity*-.3f}, 3); //Friction?
 
 		//Keep it on the screen!
 		if (gameObjs[3].trans.locPos.y < -0.9)
