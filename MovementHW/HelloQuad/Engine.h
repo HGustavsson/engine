@@ -6,6 +6,7 @@
 #include <FreeImage.h>
 #include <string>
 #include "ShaderManager.h"
+#include "ObjectManager.h"
 #include <vector>
 #include <map>
 #include <glm/gtx/transform.hpp>
@@ -19,28 +20,6 @@ struct Vertex
 
 /*Object Management*/
 
-struct Transform
-{
-	glm::vec3 locPos;
-	glm::vec3 locRot;
-	glm::vec3 locSize;
-	glm::mat4 objWorldTransform;
-};
-
-struct rigidBody
-{
-	float mass;
-	glm::vec3 velocity;
-	glm::vec3 acceleration;
-	glm::vec3 force;
-};
-
-struct Object
-{
-	Transform trans;
-	rigidBody rigid;
-	const char* imgName;
-};
 
 /*Class Methods & Variables*/
 
@@ -62,18 +41,14 @@ private:
 	GLuint vertArr;
 	uint32_t vertCount;
 	ShaderManager shadMan;
+	ObjectManager objMan;
 	std::map<const char*, GLuint> texMap;
 	std::vector<const char*> keyring;
-	std::vector<Object> gameObjs;
 	float prevFrame;
 	float deltaTime;
 	float currFrame;
 
 	//Private Methods
-	void createObj(const char*);
-	void createObj(const char*, glm::vec3, glm::vec3, glm::vec3);
-	void createObj(const char*, glm::vec3, glm::vec3, glm::vec3, float, glm::vec3);
 	void addForce(glm::vec3, uint32_t);
 	void updateObj(uint32_t num);
-	void collides(Object, Object);
 };

@@ -149,71 +149,47 @@ void Engine::buffTex()
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
-	createObj(keyring[0]);
-	createObj(keyring[1], glm::vec3{ -.7, -.5, 0 }, glm::vec3{}, glm::vec3{ .3, .3, .3 });
-	createObj(keyring[1], glm::vec3{ .7, -.5, 0 }, glm::vec3{}, glm::vec3{ .3, .3, .3 });
-	createObj(keyring[2], glm::vec3{ -.7, -.45, 0 }, glm::vec3{}, glm::vec3{ .1, .1, .1 });
-	createObj(keyring[3], glm::vec3{ 0,-.5,0 }, glm::vec3{}, glm::vec3{ .1,.1,.1 });
-	createObj(keyring[4], glm::vec3{ .7, -.6,0 }, glm::vec3{}, glm::vec3{ .1, .1, .1 });
-}
-
-void Engine::createObj(const char* imgName)
-{
-	Object obj = { {glm::vec3{0, 0, 0}, glm::vec3{0, 0, 0}, glm::vec3{1, 1, 1},
-		glm::mat4{} },{10, glm::vec3{}, glm::vec3{}, glm::vec3{}}, imgName };
-	gameObjs.push_back(obj);
-}
-
-void Engine::createObj(const char* imgName, glm::vec3 pos, glm::vec3 rot, glm::vec3 scale)
-{
-	Object obj = { { pos, rot, scale, glm::mat4{} }, { 10, glm::vec3{}, glm::vec3{}, glm::vec3{} }, imgName };
-	gameObjs.push_back(obj);
-}
-
-void Engine::createObj(const char* imgName, glm::vec3 pos, glm::vec3 rot, glm::vec3 scale, float mass, glm::vec3 velocity)
-{
-	Object obj = { { pos, rot, scale, glm::mat4{} },{ mass, velocity, glm::vec3{}, glm::vec3{} }, imgName };
-	gameObjs.push_back(obj);
+	objMan.createObj(Colliderless, keyring[0]);
+	objMan.createObj(AABB, keyring[1], glm::vec3{ -.7, -.5, 0 }, glm::vec3{}, glm::vec3{ .3, .3, .3 });
+	objMan.createObj(AABB, keyring[1], glm::vec3{ .7, -.5, 0 }, glm::vec3{}, glm::vec3{ .3, .3, .3 });
+	objMan.createObj(Spherical, keyring[2], glm::vec3{ -.7, -.45, 0 }, glm::vec3{}, glm::vec3{ .1, .1, .1 });
+	objMan.createObj(AABB, keyring[3], glm::vec3{ 0,-.5,0 }, glm::vec3{}, glm::vec3{ .1,.1,.1 });
+	objMan.createObj(Spherical, keyring[4], glm::vec3{ .7, -.6,0 }, glm::vec3{}, glm::vec3{ .1, .1, .1 });
 }
 
 void Engine::updateObj(uint32_t num)
 {
 	//Physics?
-	gameObjs[num].rigid.acceleration += ((gameObjs[num].rigid.force / gameObjs[num].rigid.mass)*deltaTime);
-	gameObjs[num].rigid.velocity += gameObjs[num].rigid.acceleration;
-	gameObjs[num].trans.locPos += (gameObjs[num].rigid.velocity * deltaTime);
+	objMan.gameObjs[num].rigid.acceleration += ((objMan.gameObjs[num].rigid.force / objMan.gameObjs[num].rigid.mass)*deltaTime);
+	objMan.gameObjs[num].rigid.velocity += objMan.gameObjs[num].rigid.acceleration;
+	objMan.gameObjs[num].trans.locPos += (objMan.gameObjs[num].rigid.velocity * deltaTime);
 
 
-	if (num == 3 && gameObjs[num].rigid.velocity.y > (float).0015)		//Limit
-		gameObjs[num].rigid.velocity.y = (float).0015;
-	else if (num == 3 && gameObjs[num].rigid.velocity.y < (float)-.002)	//Limit
-		gameObjs[num].rigid.velocity.y = (float)-.002;
-	if (num == 3 && gameObjs[num].rigid.velocity.x > (float).0015)		//Limit
-		gameObjs[num].rigid.velocity.x = (float).0015;
-	else if (num == 3 && gameObjs[num].rigid.velocity.x < (float)-.015)	//Limit
-		gameObjs[num].rigid.velocity.x = (float)-.015;
+	if (num == 3 && objMan.gameObjs[num].rigid.velocity.y > (float).0015)		//Limit
+		objMan.gameObjs[num].rigid.velocity.y = (float).0015;
+	else if (num == 3 && objMan.gameObjs[num].rigid.velocity.y < (float)-.002)	//Limit
+		objMan.gameObjs[num].rigid.velocity.y = (float)-.002;
+	if (num == 3 && objMan.gameObjs[num].rigid.velocity.x > (float).0015)		//Limit
+		objMan.gameObjs[num].rigid.velocity.x = (float).0015;
+	else if (num == 3 && objMan.gameObjs[num].rigid.velocity.x < (float)-.015)	//Limit
+		objMan.gameObjs[num].rigid.velocity.x = (float)-.015;
 
-	std::cout << gameObjs[3].trans.locPos.x << std::endl;
-	std::cout << gameObjs[3].trans.locPos.y << std::endl;
-	std::cout << gameObjs[3].trans.locPos.z << std::endl;
-	gameObjs[num].rigid.force = { 0,0,0 }; //Zero it out so it doesn't keep applying.
+	std::cout << objMan.gameObjs[3].trans.locPos.x << std::endl;
+	std::cout << objMan.gameObjs[3].trans.locPos.y << std::endl;
+	std::cout << objMan.gameObjs[3].trans.locPos.z << std::endl;
+	objMan.gameObjs[num].rigid.force = { 0,0,0 }; //Zero it out so it doesn't keep applying.
 
 	//Gen World Matrix
-	glm::mat4 scaleMat = glm::scale(gameObjs[num].trans.locSize);
-	glm::mat4 posMat = glm::translate(gameObjs[num].trans.locPos);
-	glm::mat4 rotMat = glm::yawPitchRoll(gameObjs[num].trans.locRot.y, gameObjs[num].trans.locRot.x, gameObjs[num].trans.locRot.z);
+	glm::mat4 scaleMat = glm::scale(objMan.gameObjs[num].trans.locSize);
+	glm::mat4 posMat = glm::translate(objMan.gameObjs[num].trans.locPos);
+	glm::mat4 rotMat = glm::yawPitchRoll(objMan.gameObjs[num].trans.locRot.y, objMan.gameObjs[num].trans.locRot.x, objMan.gameObjs[num].trans.locRot.z);
 	glm::mat4 worldMat = posMat*rotMat*scaleMat;
-	gameObjs[num].trans.objWorldTransform = worldMat;
+	objMan.gameObjs[num].trans.objWorldTransform = worldMat;
 }
 
 void Engine::addForce(glm::vec3 force, uint32_t numObj)
 {
-	gameObjs[numObj].rigid.force += force;
-}
-
-void Engine::collides(Object objA, Object objB)
-{
-
+	objMan.gameObjs[numObj].rigid.force += force;
 }
 
 bool Engine::gameLoop()
@@ -237,20 +213,20 @@ bool Engine::gameLoop()
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		//Update physical sim
-		for (int i = 0; i < gameObjs.size(); i++)
+		for (int i = 0; i < objMan.gameObjs.size(); i++)
 		{
 			updateObj(i);
 		}
-		for (int i = 0; i < gameObjs.size(); i++)
+		for (int i = 0; i < objMan.gameObjs.size(); i++)
 		{
-			glUniformMatrix4fv(2, 1, GL_FALSE, &gameObjs[i].trans.objWorldTransform[0][0]);
+			glUniformMatrix4fv(2, 1, GL_FALSE, &objMan.gameObjs[i].trans.objWorldTransform[0][0]);
 		
 			//Draw buffered models
-			glBindTexture(GL_TEXTURE_2D, texMap[gameObjs[i].imgName]);
+			glBindTexture(GL_TEXTURE_2D, texMap[objMan.gameObjs[i].imgName]);
 			glBindVertexArray(vertArr);
 			glDrawArrays(GL_TRIANGLES, 0, vertCount);
 		}
-		gameObjs[3].trans.locRot.z += .01;
+		objMan.gameObjs[3].trans.locRot.z += .01;
 
 		//Swap Buffers
 		glfwSwapBuffers(glfwWindowPtr);
@@ -273,9 +249,9 @@ bool Engine::gameLoop()
 		//addForce(glm::vec3{gameObjs[3].rigid.velocity*-.3f}, 3); //Friction?
 
 		//Keep it on the screen!
-		if (gameObjs[3].trans.locPos.y < -0.9)
+		if (objMan.gameObjs[3].trans.locPos.y < -0.9)
 		{
-			gameObjs[3].trans.locPos.y = -0.89;
+			objMan.gameObjs[3].trans.locPos.y = -0.89;
 		}
 		
 		//Process queued window, mouse & keyboard callback events
